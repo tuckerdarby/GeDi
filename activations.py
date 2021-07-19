@@ -18,7 +18,7 @@ import torch
 from packaging import version
 from torch import nn
 
-import logging
+import logging_utils as logging
 
 
 logger = logging.get_logger(__name__)
