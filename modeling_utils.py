@@ -980,7 +980,8 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
         while cur_len < max_length:
             model_inputs = self.prepare_inputs_for_generation(input_ids, past=past)
             if not(pad_lens is None):
-                model_inputs["pad_lens"] = pad_lens
+                # model_inputs["pad_lens"] = pad_lens
+                print('skipping pad lens')
             if not(gpt3_api_key is None):
                 next_token_logits = self.get_gpt3_logits(model_inputs["input_ids"],
                                                          tokenizer,
