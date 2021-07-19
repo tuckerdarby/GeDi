@@ -24,7 +24,6 @@ from torch import nn
 from torch.nn import CrossEntropyLoss, MSELoss
 
 from transformers import (
-    ACT2FN,
     BaseModelOutputWithPast,
     BaseModelOutputWithPastAndCrossAttentions,
     CausalLMOutputWithCrossAttentions,
@@ -36,6 +35,7 @@ from transformers import (
     logging,
     GPTNeoConfig
 )
+from activations import ACT2FN
 # from ...modeling_utils import PreTrainedModel
 from modeling_utils import PreTrainedModel
 
