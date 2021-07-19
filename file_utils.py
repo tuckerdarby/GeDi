@@ -51,7 +51,7 @@ from filelock import FileLock
 from huggingface_hub import HfApi, HfFolder, Repository
 from transformers.utils.versions import importlib_metadata
 
-from logging import logging
+import logging
 
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
