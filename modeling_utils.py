@@ -647,7 +647,6 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
     def generate(
         self,
         input_ids=None,
-        pad_lens=None,
         max_length=None,
         min_length=0,
         do_sample=True,
@@ -824,7 +823,6 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
 
         output = self._generate_no_beam_search(
             input_ids,
-            pad_lens,
             cur_len,
             max_length,
             min_length,
@@ -895,7 +893,6 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
     def _generate_no_beam_search(
         self,
         input_ids,
-        pad_lens,
         cur_len,
         max_length,
         min_length,
@@ -964,11 +961,6 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
             bsz = seq_a.shape[0]
 
             seq_batched = torch.cat((seq_a,seq_b),dim=0)
-            if pad_lens is None:
-
-                gedi_pad_lens = None
-            else:
-                gedi_pad_lens = pad_lens+pad_lens
 
         print('Here 1')
         past = None
@@ -981,9 +973,6 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
         while cur_len < max_length:
             model_inputs = self.prepare_inputs_for_generation(input_ids, past=past)
             print('loop', cur_len)
-            if not(pad_lens is None):
-                # model_inputs["pad_lens"] = pad_lens
-                print('skipping pad lens')
             if not(gpt3_api_key is None):
                 next_token_logits = self.get_gpt3_logits(model_inputs["input_ids"],
                                                          tokenizer,
@@ -1001,11 +990,8 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
                     input_batched = torch.cat((model_inputs["input_ids"],model_inputs["input_ids"]),dim=0)
                     seq_batched = torch.cat((seq_batched,input_batched),dim=1)
                     inputs = gedi_model.prepare_inputs_for_generation(seq_batched, past=gedi_past)
-                    print('gedi_pad_lens', gedi_pad_lens)
-                    inputs["pad_lens"] = gedi_pad_lens
                 else:
-
-                    inputs = {"input_ids": seq_batched, "pad_lens": gedi_pad_lens, "past":gedi_past}
+                    inputs = {"input_ids": seq_batched, "past":gedi_past}
                 print('gedi inputs', inputs)
                 gedi_outputs = gedi_model(**inputs)
                 if gedi_past is None:

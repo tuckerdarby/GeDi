@@ -220,6 +220,7 @@ def main():
     args.model_type = args.model_type.lower()
 
     config_class, model_class, tokenizer_class = MODEL_CLASSES["gpt2"]
+    
 
 
 
@@ -342,7 +343,6 @@ def main():
 
         generated_sequence = model.generate(
             input_ids=encoded_prompts,
-                                        #  pad_lens=None,
                                           max_length= args.length,
                                           temperature=args.temperature,
                                           top_k=args.k,
