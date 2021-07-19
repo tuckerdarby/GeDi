@@ -24,16 +24,17 @@ from torch import nn
 from torch.nn import CrossEntropyLoss, MSELoss
 
 from transformers import (
+    logging,
+    GPTNeoConfig
+)
+from file_utils import add_code_sample_docstrings, add_start_docstrings, add_start_docstrings_to_model_forward
+
+from modeling_outputs import (
     BaseModelOutputWithPast,
     BaseModelOutputWithPastAndCrossAttentions,
     CausalLMOutputWithCrossAttentions,
     CausalLMOutputWithPast,
     SequenceClassifierOutputWithPast,
-    add_code_sample_docstrings, 
-    add_start_docstrings, 
-    add_start_docstrings_to_model_forward,
-    logging,
-    GPTNeoConfig
 )
 from activations import ACT2FN
 # from ...modeling_utils import PreTrainedModel
