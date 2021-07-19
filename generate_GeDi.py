@@ -342,7 +342,7 @@ def main():
 
         generated_sequence = model.generate(
             input_ids=encoded_prompts,
-                                         pad_lens=None,
+                                        #  pad_lens=None,
                                           max_length= args.length,
                                           temperature=args.temperature,
                                           top_k=args.k,

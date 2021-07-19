@@ -970,6 +970,7 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
             else:
                 gedi_pad_lens = pad_lens+pad_lens
 
+        print('Here 1')
         past = None
         gedi_past = None
         desired_labels = torch.zeros(input_ids.shape[0],dtype=torch.long).to(input_ids.device)
@@ -979,6 +980,7 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
 
         while cur_len < max_length:
             model_inputs = self.prepare_inputs_for_generation(input_ids, past=past)
+            print('loop', cur_len)
             if not(pad_lens is None):
                 # model_inputs["pad_lens"] = pad_lens
                 print('skipping pad lens')
@@ -988,6 +990,7 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
                                                          -50000.00,
                                                          gpt3_api_key).to(input_ids.device)
             else:
+                print('model inputs', model_inputs)
                 outputs = self(**model_inputs)
                 next_token_logits = outputs[0][:, -1, :]
             if get_ll:
@@ -998,11 +1001,12 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
                     input_batched = torch.cat((model_inputs["input_ids"],model_inputs["input_ids"]),dim=0)
                     seq_batched = torch.cat((seq_batched,input_batched),dim=1)
                     inputs = gedi_model.prepare_inputs_for_generation(seq_batched, past=gedi_past)
+                    print('gedi_pad_lens', gedi_pad_lens)
                     inputs["pad_lens"] = gedi_pad_lens
                 else:
 
                     inputs = {"input_ids": seq_batched, "pad_lens": gedi_pad_lens, "past":gedi_past}
-
+                print('gedi inputs', inputs)
                 gedi_outputs = gedi_model(**inputs)
                 if gedi_past is None:
                     if gedi_outputs[0].shape[1]>1:
