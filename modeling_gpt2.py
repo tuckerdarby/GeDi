@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss
 
+from transformers import GPT2Model
 from transformers.configuration_gpt2 import GPT2Config
 from transformers.file_utils import add_start_docstrings, add_start_docstrings_to_callable
 # from transformers.modeling_utils import Conv1D, PreTrainedModel, SequenceSummary, prune_conv1d_layer
@@ -328,7 +329,7 @@ GPT2_INPUTS_DOCSTRING = r"""
     "The bare GPT2 Model transformer outputting raw hidden-states without any specific head on top.",
     GPT2_START_DOCSTRING,
 )
-class GPT2Model(GPT2PreTrainedModel):
+class GPT2Model_custom(GPT2PreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
         self.output_hidden_states = config.output_hidden_states
@@ -652,7 +653,7 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
         """
         transformer_outputs = self.transformer(
             input_ids,
-            pad_lens=pad_lens,
+            # pad_lens=pad_lens,
             past=past,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
