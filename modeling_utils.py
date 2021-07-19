@@ -962,7 +962,6 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
 
             seq_batched = torch.cat((seq_a,seq_b),dim=0)
 
-        print('Here 1')
         past = None
         gedi_past = None
         desired_labels = torch.zeros(input_ids.shape[0],dtype=torch.long).to(input_ids.device)
@@ -972,14 +971,12 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
 
         while cur_len < max_length:
             model_inputs = self.prepare_inputs_for_generation(input_ids, past=past)
-            print('loop', cur_len)
             if not(gpt3_api_key is None):
                 next_token_logits = self.get_gpt3_logits(model_inputs["input_ids"],
                                                          tokenizer,
                                                          -50000.00,
                                                          gpt3_api_key).to(input_ids.device)
             else:
-                print('model inputs', model_inputs)
                 outputs = self(**model_inputs)
                 next_token_logits = outputs[0][:, -1, :]
             if get_ll:
@@ -992,7 +989,6 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
                     inputs = gedi_model.prepare_inputs_for_generation(seq_batched, past=gedi_past)
                 else:
                     inputs = {"input_ids": seq_batched, "past":gedi_past}
-                print('gedi inputs', inputs)
                 gedi_outputs = gedi_model(**inputs)
                 if gedi_past is None:
                     if gedi_outputs[0].shape[1]>1:
