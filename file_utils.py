@@ -52,7 +52,7 @@ from huggingface_hub import HfApi, HfFolder, Repository
 from transformers.utils.versions import importlib_metadata
 
 from . import __version__
-from transformers import logging
+from logging import logging
 
 
 logger = logging.get_logger(__name__)  # pylint: disable=invalid-name
