@@ -9,8 +9,7 @@ import torch
 import torch.nn as nn
 from torch.nn import CrossEntropyLoss
 
-from transformers import GPT2Model
-from transformers.configuration_gpt2 import GPT2Config
+from transformers import GPT2Model, GPT2Config
 from transformers.file_utils import add_start_docstrings, add_start_docstrings_to_callable
 # from transformers.modeling_utils import Conv1D, PreTrainedModel, SequenceSummary, prune_conv1d_layer
 from modeling_utils import Conv1D, PreTrainedModel, SequenceSummary, prune_conv1d_layer

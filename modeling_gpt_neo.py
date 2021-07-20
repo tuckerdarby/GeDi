@@ -11,7 +11,7 @@ from transformers import GPTNeoModel
 class GediGPTNeoModel(GPTNeoModel, GediMixin):
     gedi_mode = True
 
-class GPTNeoForCausalLM(GPTNeoPreTrainedModel):
+class GediGPTNeoForCausalLM(GPTNeoPreTrainedModel):
     _keys_to_ignore_on_load_missing = [r"h\.\d+\.attn\.masked_bias", r"lm_head\.weight"]
     _keys_to_ignore_on_save = [r"lm_head.weight"]
 
