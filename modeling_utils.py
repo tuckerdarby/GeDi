@@ -971,14 +971,8 @@ class PreTrainedModel(nn.Module, ModuleUtilsMixin):
 
         while cur_len < max_length:
             model_inputs = self.prepare_inputs_for_generation(input_ids, past=past)
-            if not(gpt3_api_key is None):
-                next_token_logits = self.get_gpt3_logits(model_inputs["input_ids"],
-                                                         tokenizer,
-                                                         -50000.00,
-                                                         gpt3_api_key).to(input_ids.device)
-            else:
-                outputs = self(**model_inputs)
-                next_token_logits = outputs[0][:, -1, :]
+            outputs = self(**model_inputs)
+            next_token_logits = outputs[0][:, -1, :]
             if get_ll:
                 next_token_logp = torch.log_softmax(next_token_logits,-1)
             if not(gedi_model is None):
