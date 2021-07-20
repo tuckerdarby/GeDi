@@ -10,9 +10,7 @@ import torch.nn as nn
 from torch.nn import CrossEntropyLoss
 
 from transformers import GPT2Model, GPT2Config
-from transformers.file_utils import add_start_docstrings, add_start_docstrings_to_callable
-# from transformers.modeling_utils import Conv1D, PreTrainedModel, SequenceSummary, prune_conv1d_layer
-from modeling_utils import Conv1D, PreTrainedModel, SequenceSummary, prune_conv1d_layer
+from modeling_utils import Conv1D, PreTrainedModel, prune_conv1d_layer
 
 
 logger = logging.getLogger(__name__)
@@ -324,10 +322,6 @@ GPT2_INPUTS_DOCSTRING = r"""
 """
 
 
-@add_start_docstrings(
-    "The bare GPT2 Model transformer outputting raw hidden-states without any specific head on top.",
-    GPT2_START_DOCSTRING,
-)
 class GPT2Model_custom(GPT2PreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
@@ -358,7 +352,6 @@ class GPT2Model_custom(GPT2PreTrainedModel):
         for layer, heads in heads_to_prune.items():
             self.h[layer].attn.prune_heads(heads)
 
-    @add_start_docstrings_to_callable(GPT2_INPUTS_DOCSTRING)
     def forward(
         self,
         input_ids=None,
@@ -526,11 +519,6 @@ class GPT2Model_custom(GPT2PreTrainedModel):
         return outputs  # last hidden state, (presents), (all hidden_states), (attentions)
 
 
-@add_start_docstrings(
-    """The GPT2 Model transformer with a language modeling head on top
-    (linear layer with weights tied to the input embeddings). """,
-    GPT2_START_DOCSTRING,
-)
 class GPT2LMHeadModel(GPT2PreTrainedModel):
     def __init__(self, config):
         super().__init__(config)
@@ -560,7 +548,6 @@ class GPT2LMHeadModel(GPT2PreTrainedModel):
         inputs.update(kwargs)
         return inputs
 
-    @add_start_docstrings_to_callable(GPT2_INPUTS_DOCSTRING)
     def forward(
         self,
         input_ids=None,
