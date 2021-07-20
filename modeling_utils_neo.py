@@ -314,7 +314,7 @@ class GediMixin(generation_utils.GenerationMixin):
                     seq_batched = torch.cat((seq_batched,input_batched),dim=1)
                     inputs = gedi_model.prepare_inputs_for_generation(seq_batched, past=gedi_past)
                 else:
-                    inputs = {"input_ids": seq_batched, "past":gedi_past}
+                    inputs = {"input_ids": seq_batched, "past_key_values":gedi_past}
                 gedi_outputs = gedi_model(**inputs)
                 if gedi_past is None:
                     if gedi_outputs[0].shape[1]>1:
