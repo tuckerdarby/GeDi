@@ -312,7 +312,7 @@ class GediMixin(generation_utils.GenerationMixin):
                 if not gedi_past is None:
                     input_batched = torch.cat((model_inputs["input_ids"],model_inputs["input_ids"]),dim=0)
                     seq_batched = torch.cat((seq_batched,input_batched),dim=1)
-                    inputs = gedi_model.prepare_inputs_for_generation(seq_batched, past=gedi_past)
+                    inputs = gedi_model.prepare_inputs_for_generation(seq_batched, past_key_values=gedi_past)
                 else:
                     inputs = {"input_ids": seq_batched, "past_key_values":gedi_past}
                 gedi_outputs = gedi_model(**inputs)
