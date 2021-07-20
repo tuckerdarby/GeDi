@@ -469,7 +469,7 @@ class GediMixin(generation_utils.GenerationMixin):
             if get_ll:
                 sequence_ll += next_token_logp[0,next_token]
             input_ids = torch.cat([input_ids, tokens_to_add.unsqueeze(-1)], dim=-1)
-            unfinished_sents.mul_(tokens_to_add.ne([eos_token_id]).long())
+            unfinished_sents.mul_(tokens_to_add.ne(eos_token_id).long())
             cur_len = cur_len + 1
 
             # stop when there is a </s> in each sentence, or if we exceed the maximul length
