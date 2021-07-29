@@ -88,28 +88,16 @@ def simple_accuracy(preds, labels):
 try:
     from torch.utils.tensorboard import SummaryWriter
 except ImportError:
+    print('error!')
     from tensorboardX import SummaryWriter
 
 
 logger = logging.getLogger(__name__)
 
-ALL_MODELS = sum(
-    (
-        tuple(conf.pretrained_config_archive_map.keys())
-        for conf in (
-            BertConfig,
-            XLNetConfig,
-            XLMConfig,
-            RobertaConfig,
-            DistilBertConfig,
-            AlbertConfig,
-            XLMRobertaConfig,
-            FlaubertConfig,
-            GPT2Config
-        )
-    ),
-    (),
+ALL_MODELS = (
+    'gpt2', 'gpt2-medium', 'gpt2-large', 'gpt2-xl'
 )
+
 
 MODEL_CLASSES = {
     "bert": (BertConfig, BertForSequenceClassification, BertTokenizer),
@@ -690,8 +678,8 @@ def evaluate(args, model, tokenizer, prefix=""):
         result.update({'overall_gen_loss':overall_gen_loss})
 
         output_eval_file = os.path.join(eval_output_dir, prefix, "eval_results.txt")
-        print(result)
-        print(results)
+        # print(result)
+        # print(results)
         with open(output_eval_file, "w") as writer:
             logger.info("***** Eval results {} *****".format(prefix))
             for key in sorted(result.keys()):
@@ -699,7 +687,7 @@ def evaluate(args, model, tokenizer, prefix=""):
                 writer.write("%s = %s\n" % (key, str(result[key])))
             if eval_task == 'cola':
                 accf1 = acc_and_f1(preds, out_label_ids)
-                print(accf1)
+                # print(accf1)
                 for key in sorted(accf1.keys()):
                     logger.info("  %s = %s", key, str(accf1[key]))
                     writer.write("%s = %s\n" % (key, str(accf1[key])))
@@ -730,6 +718,7 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False):
     else:
         logger.info("Creating features from dataset file at %s", args.data_dir)
         label_list = processor.get_labels()
+        # print(label_list)
         if task in ["mnli", "mnli-mm"] and args.model_type in ["roberta", "xlmroberta"]:
             # HACK(label indices are swapped in RoBERTa pretrained model)
             label_list[1], label_list[2] = label_list[2], label_list[1]
@@ -749,9 +738,9 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False):
             label_list=label_list,
             max_length=args.max_seq_length,
             output_mode=output_mode,
-            pad_on_left=bool(args.model_type in ["xlnet"]),  # pad on the left for xlnet
-            pad_token=tokenizer.convert_tokens_to_ids([tokenizer.pad_token])[0],
-            pad_token_segment_id=4 if args.model_type in ["xlnet"] else 0,
+            # pad_on_left=bool(args.model_type in ["xlnet"]),  # pad on the left for xlnet
+            # pad_token=tokenizer.convert_tokens_to_ids([tokenizer.pad_token])[0],
+            # pad_token_segment_id=4 if args.model_type in ["xlnet"] else 0,
         )
         if args.local_rank in [-1, 0]:
             logger.info("Saving features into cached file %s", cached_features_file)
@@ -763,6 +752,10 @@ def load_and_cache_examples(args, task, tokenizer, evaluate=False):
     # Convert to Tensors and build dataset
     all_input_ids = torch.tensor([f.input_ids for f in features], dtype=torch.long)
     all_attention_mask = torch.tensor([f.attention_mask for f in features], dtype=torch.long)
+    
+    # print([f.token_type_ids for f in features])
+    # print(features)
+
     all_token_type_ids = torch.tensor([f.token_type_ids for f in features], dtype=torch.long)
     if output_mode == "classification":
         all_labels = torch.tensor([f.label for f in features], dtype=torch.long)
@@ -779,37 +772,37 @@ def main():
     # Required parameters
     parser.add_argument(
         "--data_dir",
-        default=None,
+        default='data/AG-news/',
         type=str,
-        required=True,
+        required=False,
         help="The input data dir. Should contain the .tsv files (or other data files) for the task.",
     )
     parser.add_argument(
         "--model_type",
-        default=None,
+        default='gpt2',
         type=str,
-        required=True,
+        required=False,
         help="Model type selected in the list: " + ", ".join(MODEL_CLASSES.keys()),
     )
     parser.add_argument(
         "--model_name_or_path",
-        default=None,
+        default='gpt2',
         type=str,
-        required=True,
+        required=False,
         help="Path to pre-trained model or shortcut name selected in the list: " + ", ".join(ALL_MODELS),
     )
     parser.add_argument(
         "--task_name",
-        default=None,
+        default='sst-2',
         type=str,
-        required=True,
+        required=False,
         help="The name of the task to train selected in the list: " + ", ".join(processors.keys()),
     )
     parser.add_argument(
         "--output_dir",
-        default=None,
+        default='output',
         type=str,
-        required=True,
+        required=False,
         help="The output directory where the model predictions and checkpoints will be written.",
     )
 
@@ -845,7 +838,7 @@ def main():
         help="The maximum total input sequence length after tokenization. Sequences longer "
         "than this will be truncated, sequences shorter will be padded.",
     )
-    parser.add_argument("--do_train", action="store_true", help="Whether to run training.")
+    parser.add_argument("--do_train", default=True, action="store_true", help="Whether to run training.")
     parser.add_argument("--do_eval", action="store_true", help="Whether to run eval on the dev set.")
 
 
@@ -925,8 +918,8 @@ def main():
                         help="custom ops for SST-5")
     parser.add_argument("--jigsaw", action="store_true", help="custom setup for jigsaw")
     parser.add_argument("--jigsaw_no_toxic_gen", action="store_true", help="custom setup for jigsaw - gen_loss used only for non-toxic samples | check training loop")
-    parser.add_argument("--code_0", type=str, default="negative", help="control code to be used for code 1 of 2 (we support 3 at most - with the third one = 'neutral' for now)")
-    parser.add_argument("--code_1", type=str, default="positive", help="control code to be used for code 2 of 2 (we support 3 at most - with the third one = 'neutral' for now)")
+    parser.add_argument("--code_0", type=str, default="false", help="control code to be used for code 1 of 2 (we support 3 at most - with the third one = 'neutral' for now)")
+    parser.add_argument("--code_1", type=str, default="true", help="control code to be used for code 2 of 2 (we support 3 at most - with the third one = 'neutral' for now)")
 
 #     args = parser.parse_args()
     args, unknown = parser.parse_known_args()
@@ -982,13 +975,16 @@ def main():
 
 
     # Prepare GLUE task
+    print('Prepare GLUE task')
     args.task_name = args.task_name.lower()
     if args.task_name not in processors:
         raise ValueError("Task not found: %s" % (args.task_name))
     processor = processors[args.task_name]()
     args.output_mode = output_modes[args.task_name]
     label_list = processor.get_labels()
+    # print(label_list)
     num_labels = len(label_list)
+    print('\n')
 
     # Load pretrained model and tokenizer
     if args.local_rank not in [-1, 0]:
